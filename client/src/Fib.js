@@ -1,60 +1,57 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-class Fib extends Component {
-    state = {
-        seenIndexes: [],
-        values: {},
-        index: ''
-    };
+function Fib() {
+    const [seenIndexes, setSeenIndexes] = useState([]);
+    const [values, setValues] = useState({});
+    const [index, setIndex] = useState('');
 
-    componentDidMount() {
-        this.fetchValues();
-        this.fetchIndexes();
-    }
+    useEffect(() => {
+        fetchValues();
+        fetchIndexes();
+    }, []);
 
-    async fetchValues() {
+    const fetchValues = async () => {
         const values = await axios.get('/api/values/current');
-        this.setState({ values: values.data });
+        setValues(values.data);
     }
 
-    async fetchIndexes() {
+    const fetchIndexes = async () => {
         const seenIndexes = await axios.get('/api/values/all');
-        this.setState({ seenIndexes: seenIndexes.data });
+        setSeenIndexes(seenIndexes.data);
     }
 
-    handleSubmit = async (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         await axios.post('/api/values', {
-            index: this.state.index
+            index
         });
 
-        this.setState({ index: '' });
+        setIndex('');
     };
 
-    render() {
-        return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <label>Enter your index:</label>
-                    <input value={this.state.index} onChange={event => this.setState({ index: event.target.value })} />
-                    <button>Submit</button>
-                </form>
-                <h3>Indexes I have seen:</h3>
-                {
-                    this.state.seenIndexes.map(({ number }, index) => (<span key={index}>{number}, </span>))
-                }
-                <h3>Calculated values:</h3>
-                {
-                    Object.entries(this.state.values).map(([key, value]) => (
-                        <div key={key}>
-                            For index {key} I calculated {value}
-                        </div>
-                    ))
-                }
-            </div>
-        );
-    }
+    return (
+        <div>
+            <form onSubmit={handleSubmit}>
+                <label>Enter your index:</label>
+                <input value={index} onChange={event => setIndex(event.target.value)} />
+                <button>Submit</button>
+            </form>
+            <h3>Indexes I have seen:</h3>
+            {
+                seenIndexes.map(({ number }, index) => (<span key={index}>{number}, </span>))
+            }
+            <h3>Calculated values:</h3>
+            {
+                Object.entries(values).map(([key, value]) => (
+                    <div key={key}>
+                        For index {key} I calculated {value}
+                    </div>
+                ))
+            }
+        </div>
+    );
+
 }
 
 export default Fib;
