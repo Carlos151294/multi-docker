@@ -20,5 +20,17 @@ after_success:
     - docker push carlosfn224/multi-nginx
     - docker push carlosfn224/multi-server
     - docker push carlosfn224/multi-worker
+
+deploy:
+    provider: elasticbeanstalk
+    region: us-east-2
+    app: multi-docker
+    env: MultiDocker-env
+    bucket_name: elasticbeanstalk-us-east-2-601670308014
+    bucket_path: docker-multi 
+    on: 
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
     
 
